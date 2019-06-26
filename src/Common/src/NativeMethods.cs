@@ -2457,7 +2457,6 @@ namespace System.Windows.Forms
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [Serializable]
         public struct MSG
         {
             public IntPtr hwnd;
@@ -3314,8 +3313,8 @@ namespace System.Windows.Forms
             public int[] widths = new int[6];
         }
 
+        // TODO: determine if class or struct
         [StructLayout(LayoutKind.Sequential)]
-        [Serializable]
         public class MSOCRINFOSTRUCT
         {
             public int cbSize = Marshal.SizeOf<MSOCRINFOSTRUCT>();              // size of MSOCRINFO structure in bytes.
