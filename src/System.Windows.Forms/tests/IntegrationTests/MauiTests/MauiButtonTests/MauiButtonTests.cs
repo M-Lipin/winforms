@@ -77,5 +77,6 @@ namespace System.Windows.Forms.IntegrationTests.MauiTests
 
             return new ScenarioResult(!_wasClicked);
         }
+
     }
 }
