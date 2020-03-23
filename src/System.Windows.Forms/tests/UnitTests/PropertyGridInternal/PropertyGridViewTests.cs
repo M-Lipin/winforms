@@ -4,11 +4,11 @@
 
 using Xunit;
 
-namespace System.Windows.Forms.Tests.PropertyGridInternal
+namespace System.Windows.Forms.Tests.PropertyGridInternal.Tests
 {
     public class PropertyGridViewTests
     {
-        [Fact]
+        [WinFormsFact]
         public void PropertyGridView_Constructor()
         {
             var propertyGrid = new PropertyGrid();
@@ -18,7 +18,6 @@ namespace System.Windows.Forms.Tests.PropertyGridInternal
             var item = propertyGrid.SelectedGridItem;
 
             Assert.NotNull(item);
-
             Assert.NotNull(item.Value);
         }
     }
