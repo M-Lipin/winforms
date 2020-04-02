@@ -14,8 +14,8 @@ namespace System.Windows.Forms
         {
             private const int ChildId = 2;
 
-            public CalendarNextButtonAccessibleObject(MonthCalendarAccessibleObject calendarAccessibleObject, int calendarIndex)
-                : base(calendarAccessibleObject, calendarIndex, CalendarButtonType.Next)
+            public CalendarNextButtonAccessibleObject(MonthCalendarAccessibleObject calendarAccessibleObject)
+                : base(calendarAccessibleObject, 0, CalendarButtonType.Next)
             {
             }
 
