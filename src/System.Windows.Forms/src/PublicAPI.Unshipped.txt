@@ -7,3 +7,8 @@ System.Windows.Forms.ListViewGroup.TitleImageKey.set -> void
 ~System.Windows.Forms.ListView.GroupImageList.get -> System.Windows.Forms.ImageList
 ~System.Windows.Forms.ListView.GroupImageList.set -> void
 ~override System.Windows.Forms.PictureBox.CreateAccessibilityInstance() -> System.Windows.Forms.AccessibleObject
+System.Windows.Forms.ListViewGroup.Subtitle.get -> string!
+System.Windows.Forms.ListViewGroup.Subtitle.set -> void
+~override System.Windows.Forms.RichTextBox.CreateAccessibilityInstance() -> System.Windows.Forms.AccessibleObject
+~override System.Windows.Forms.TextBox.OnKeyUp(System.Windows.Forms.KeyEventArgs e) -> void
+~override System.Windows.Forms.TextBox.OnMouseDown(System.Windows.Forms.MouseEventArgs e) -> void

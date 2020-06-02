@@ -1,0 +1,37 @@
+System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.AllCap = 2 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.AllPetiteCaps = 3 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.None = 0 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.Other = -1 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.PetiteCaps = 4 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.SmallCap = 1 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.Titling = 6 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.CapStyle.Unicase = 5 -> System.Windows.Forms.Automation.CapStyle
+System.Windows.Forms.Automation.HorizontalTextAlignment
+System.Windows.Forms.Automation.HorizontalTextAlignment.Centered = 1 -> System.Windows.Forms.Automation.HorizontalTextAlignment
+System.Windows.Forms.Automation.HorizontalTextAlignment.Justified = 3 -> System.Windows.Forms.Automation.HorizontalTextAlignment
+System.Windows.Forms.Automation.HorizontalTextAlignment.Left = 0 -> System.Windows.Forms.Automation.HorizontalTextAlignment
+System.Windows.Forms.Automation.HorizontalTextAlignment.Right = 2 -> System.Windows.Forms.Automation.HorizontalTextAlignment
+System.Windows.Forms.Automation.IAutomationLiveRegion
+System.Windows.Forms.Automation.IAutomationLiveRegion.LiveSetting.get -> System.Windows.Forms.Automation.AutomationLiveSetting
+System.Windows.Forms.Automation.IAutomationLiveRegion.LiveSetting.set -> void
+System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.Dash = 5 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.DashDot = 6 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.DashDotDot = 7 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.Dot = 4 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.Double = 3 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.DoubleWavy = 11 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.LongDash = 13 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.None = 0 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.Other = -1 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.Single = 1 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickDash = 14 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickDashDot = 15 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickDashDotDot = 16 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickDot = 17 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickLongDash = 18 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickSingle = 9 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.ThickWavy = 12 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.Wavy = 8 -> System.Windows.Forms.Automation.TextDecorationLineStyle
+System.Windows.Forms.Automation.TextDecorationLineStyle.WordsOnly = 2 -> System.Windows.Forms.Automation.TextDecorationLineStyle
