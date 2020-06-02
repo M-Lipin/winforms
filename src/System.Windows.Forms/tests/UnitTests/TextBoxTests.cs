@@ -446,11 +446,12 @@ namespace System.Windows.Forms.Tests
         public void TextBox_CreateAccessibilityInstance_Invoke_ReturnsExpected()
         {
             using var control = new SubTextBox();
-            Control.ControlAccessibleObject instance = Assert.IsType<Control.ControlAccessibleObject>(control.CreateAccessibilityInstance());
+            Assert.True(control.CreateAccessibilityInstance() is Control.ControlAccessibleObject);
+            Control.ControlAccessibleObject instance = (Control.ControlAccessibleObject)control.CreateAccessibilityInstance();
             Assert.NotNull(instance);
             Assert.Same(control, instance.Owner);
             Assert.Equal(AccessibleRole.Text, instance.Role);
-            Assert.NotSame(control.CreateAccessibilityInstance(), instance);
+            Assert.NotSame(control.CreateAccessibilityInstance(), instance); // Create a new instance
             Assert.NotSame(control.AccessibilityObject, instance);
         }
 
@@ -461,7 +462,8 @@ namespace System.Windows.Forms.Tests
             {
                 AccessibleRole = AccessibleRole.HelpBalloon
             };
-            Control.ControlAccessibleObject instance = Assert.IsType<Control.ControlAccessibleObject>(control.CreateAccessibilityInstance());
+            Assert.True(control.CreateAccessibilityInstance() is Control.ControlAccessibleObject);
+            Control.ControlAccessibleObject instance = (Control.ControlAccessibleObject)control.CreateAccessibilityInstance();
             Assert.NotNull(instance);
             Assert.Same(control, instance.Owner);
             Assert.Equal(AccessibleRole.HelpBalloon, instance.Role);

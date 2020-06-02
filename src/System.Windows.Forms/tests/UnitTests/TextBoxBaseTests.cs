@@ -7977,5 +7977,215 @@ namespace System.Windows.Forms.Tests
 
             public new void WndProc(ref Message m) => base.WndProc(ref m);
         }
+
+        private class SubTextBoxBase : TextBoxBase
+        {
+        }
+
+        [WinFormsTheory]
+        [InlineData(30, 0, 0)]
+        [InlineData(30, 19, 1)] // Only 1 lines are placed at a height equal to 19
+        [InlineData(30, 50, 3)] // Only 3 lines are placed at a height equal to 50
+        [InlineData(30, 100, 6)] // Only 6 lines are placed at a height equal to 100
+        public void TextBoxBase_LinesPerPage_IsCorrect(int width, int height, int lines)
+        {
+            using TextBoxBase textBoxBase = new SubTextBoxBase { Size = new Size(width, height) };
+            Assert.Equal(1, textBoxBase.LinesPerPage);
+
+            textBoxBase.Multiline = true;
+            Assert.Equal(lines, textBoxBase.LinesPerPage);
+        }
+
+        [WinFormsFact]
+        public void TextBoxBase_GetFirstVisibleLine_ReturnsCorrectValue()
+        {
+            using TextBoxBase textBoxBase = new SubTextBoxBase();
+            int line = textBoxBase.GetFirstVisibleLine();
+            Assert.Equal(0, line);
+
+            textBoxBase.Multiline = true;
+
+            textBoxBase.Size = new Size(50, 100);
+            line = textBoxBase.GetFirstVisibleLine();
+            Assert.Equal(0, line);
+
+            textBoxBase.LineScroll(0, 2);
+            line = textBoxBase.GetFirstVisibleLine();
+            Assert.Equal(0, line);
+
+            textBoxBase.Text = "Some long long test text for testing GetFirstVisibleLine method";
+            textBoxBase.LineScroll(0, 2);
+            line = textBoxBase.GetFirstVisibleLine();
+            Assert.Equal(2, line);
+        }
+
+        public static IEnumerable<object[]> TextBoxBase_GetLineFromCharIndex_TestData()
+        {
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false }, 0, 0 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false }, 50, 0 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 50), Multiline = true }, 50, 3 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 50), Multiline = true }, 50, 8 };
+        }
+
+        [WinFormsTheory]
+        [MemberData(nameof(TextBoxBase_GetLineFromCharIndex_TestData))]
+        public void TextBoxBase_GetLineFromCharIndex_ReturnsCorrectValue(TextBoxBase textBoxBase, int charIndex, int expectedLine)
+        {
+            textBoxBase.Text = "Some test text for testing GetLineFromCharIndex method";
+            int actualLine = textBoxBase.GetLineFromCharIndex(charIndex);
+            Assert.Equal(expectedLine, actualLine);
+        }
+
+        public static IEnumerable<object[]> TextBoxBase_GetLineIndex_TestData()
+        {
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false }, 0, 0 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false }, 3, 0 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 50), Multiline = true }, 3, 19 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 50), Multiline = true }, 3, 40 };
+        }
+
+        [WinFormsTheory]
+        [MemberData(nameof(TextBoxBase_GetLineIndex_TestData))]
+        public void TextBoxBase_GetLineIndex_ReturnsCorrectValue(TextBoxBase textBoxBase, int lineIndex, int expectedIndex)
+        {
+            textBoxBase.Text = "Some test text for testing GetLineIndex method";
+            int actualIndex = textBoxBase.GetLineIndex(lineIndex);
+            Assert.Equal(expectedIndex, actualIndex);
+        }
+
+        public static IEnumerable<object[]> TextBoxBase_GetPositionFromCharIndex_TestData()
+        {
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false }, 0, new Point(1, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false }, 15, new Point(79, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 50), Multiline = true }, 12, new Point(14, 31) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 50), Multiline = true }, 22, new Point(37, 16) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 50), Multiline = true }, 100, Point.Empty };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 50), Multiline = true }, -1, Point.Empty };
+        }
+
+        [WinFormsTheory]
+        [MemberData(nameof(TextBoxBase_GetPositionFromCharIndex_TestData))]
+        public void TextBoxBase_GetPositionFromCharIndex_ReturnsCorrectValue(TextBoxBase textBoxBase, int charIndex, Point expectedPoint)
+        {
+            textBoxBase.Text = "Some test text for testing GetPositionFromCharIndex method";
+            Point actualPoint = textBoxBase.GetPositionFromCharIndex(charIndex);
+            Assert.True(actualPoint.X >= expectedPoint.X - 1 || actualPoint.X <= expectedPoint.X + 1);
+            Assert.True(actualPoint.Y >= expectedPoint.Y - 1 || actualPoint.Y <= expectedPoint.Y + 1);
+        }
+
+        public static IEnumerable<object[]> TextBoxBase_GetRectangle_TestData()
+        {
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Multiline = false } };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 100), Multiline = true } };
+        }
+
+        [WinFormsTheory]
+        [MemberData(nameof(TextBoxBase_GetRectangle_TestData))]
+        public void TextBoxBase_GetRectangle_ReturnsNonEmptyValue(TextBoxBase textBoxBase)
+        {
+            Rectangle actualRectangle = textBoxBase.GetRectangle();
+
+            // actualRectangle isn't empty
+            Assert.NotEqual(Rectangle.Empty, actualRectangle);
+        }
+
+        [WinFormsTheory]
+        [InlineData("")]
+        [InlineData("Some test text for testing")]
+        [InlineData("Some test text for testing GetTextLength method")]
+        public void TextBoxBase_GetTextLength_ReturnsNonEmptyValue(string text)
+        {
+            using TextBoxBase textBoxBase = new SubTextBoxBase();
+            textBoxBase.Text = text;
+            int actualLength = textBoxBase.GetTextLength();
+            Assert.Equal(textBoxBase.Text.Length, actualLength);
+        }
+
+        public static IEnumerable<object[]> TextBoxBase_GetVisibleRangePoints_TestData()
+        {
+            yield return new object[] { new SubTextBoxBase { Size = new Size(0, 0) }, 0, 0 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(0, 20) }, 0, 0 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20) }, 0, 7 };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(120, 20) }, 0, 23 };
+        }
+
+        [WinFormsTheory]
+        [MemberData(nameof(TextBoxBase_GetVisibleRangePoints_TestData))]
+        public void TextBoxBase_GetVisibleRangePoints_ReturnsNonEmptyValue(TextBoxBase textBoxBase, int expectedStart, int expectedEnd)
+        {
+            textBoxBase.Text = "Some test text for testing";
+            textBoxBase.GetVisibleRangePoints(out int start, out int end);
+
+            Assert.Equal(expectedStart, start);
+            Assert.Equal(expectedEnd, end);
+        }
+
+        [WinFormsTheory]
+        [InlineData(-15)]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(15)]
+        [InlineData(int.MaxValue)]
+        [InlineData(int.MinValue)]
+        public void TextBoxBase_IntPtrToInt32_ReturnsCorrectValue(int expected)
+        {
+            IntPtr ptr = new IntPtr(expected);
+            int actual = typeof(TextBoxBase).TestAccessor().Dynamic.IntPtrToInt32(ptr);
+            Assert.Equal(expected, actual);
+        }
+
+        [WinFormsFact]
+        public void TextBoxBase_SelectObject_SetCorrectly()
+        {
+            using TextBoxBase textBoxBase = new SubTextBoxBase();
+            Assert.NotEqual(IntPtr.Zero, textBoxBase.Handle);
+            IntPtr hdc = GetDC(textBoxBase.Handle);
+            IntPtr hfont = textBoxBase.GetFont();
+            IntPtr result = TextBoxBase.SelectObject(hdc, hfont);
+            Assert.NotEqual(IntPtr.Zero, result);
+        }
+
+        [WinFormsFact]
+        public void TextBoxBase_Scrollable_IsFalse()
+        {
+            using TextBoxBase textBoxBase = new SubTextBoxBase();
+            Assert.True(textBoxBase.Scrollable);
+        }
+
+        public static IEnumerable<object[]> TextBoxBase_GetPositionFromCharUR_ReturnsCorrectValue_TestData()
+        {
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Text = "", Multiline = false }, 0, new Point(0, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Text = "Some test text", Multiline = false }, 100, new Point(0, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Text = "Some test text", Multiline = false }, -1, new Point(0, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Text = "Some test text", Multiline = false }, 12, new Point(72, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(50, 20), Text = "Some test text", Multiline = true }, 12, new Point(20, 30) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \n text", Multiline = false }, 10, new Point(56, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \n text", Multiline = true }, 10, new Point(59, 1) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \r\n text", Multiline = false }, 10, new Point(56, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \r\n text", Multiline = true }, 10, new Point(59, 1) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \r\n text", Multiline = false }, 12, new Point(60, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \r\n text", Multiline = true }, 12, new Point(7, 16) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \t text", Multiline = false }, 10, new Point(57, 0) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(100, 60), Text = "Some test \t text", Multiline = true }, 10, new Point(60, 1) };
+            yield return new object[] { new SubTextBoxBase { Size = new Size(40, 60), Text = "Some test \t text", Multiline = true }, 12, new Point(8, 46) };
+        }
+
+        [WinFormsTheory]
+        [MemberData(nameof(TextBoxBase_GetPositionFromCharUR_ReturnsCorrectValue_TestData))]
+        public void TextBoxBase_GetPositionFromCharUR_ReturnsCorrectValue(TextBoxBase textBoxBase, int charIndex, Point expectedPoint)
+        {
+            Point actualPoint = textBoxBase.GetPositionFromCharUR(charIndex, textBoxBase.Text);
+            Assert.True(actualPoint.X >= expectedPoint.X - 1 || actualPoint.X <= expectedPoint.X + 1);
+            Assert.True(actualPoint.Y >= expectedPoint.Y - 1 || actualPoint.Y <= expectedPoint.Y + 1);
+        }
+
+        [WinFormsFact]
+        public void TextBoxBase_GetLogfont_IsFalse()
+        {
+            using TextBoxBase textBoxBase = new SubTextBoxBase();
+            LOGFONTW logFont = textBoxBase.GetLogfont();
+            string actual = logFont.FaceName.ToString();
+            Assert.Equal("Segoe UI", actual);
+        }
     }
 }
