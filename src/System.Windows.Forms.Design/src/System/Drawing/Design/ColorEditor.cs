@@ -1100,13 +1100,13 @@ namespace System.Drawing.Design
                 switch ((WM)msg)
                 {
                     case WM.INITDIALOG:
-                        SendDlgItemMessageW(hwnd, (DialogItemID)COLOR.HUE, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
-                        SendDlgItemMessageW(hwnd, (DialogItemID)COLOR.SAT, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
-                        SendDlgItemMessageW(hwnd, (DialogItemID)COLOR.LUM, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
-                        SendDlgItemMessageW(hwnd, (DialogItemID)COLOR.RED, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
-                        SendDlgItemMessageW(hwnd, (DialogItemID)COLOR.GREEN, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
-                        SendDlgItemMessageW(hwnd, (DialogItemID)COLOR.BLUE, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
-                        IntPtr hwndCtl = GetDlgItem(hwnd, (DialogItemID)COLOR.MIX);
+                        SendDlgItemMessageW(hwnd, (DialogItemID)COLORDLG.HUE, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
+                        SendDlgItemMessageW(hwnd, (DialogItemID)COLORDLG.SAT, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
+                        SendDlgItemMessageW(hwnd, (DialogItemID)COLORDLG.LUM, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
+                        SendDlgItemMessageW(hwnd, (DialogItemID)COLORDLG.RED, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
+                        SendDlgItemMessageW(hwnd, (DialogItemID)COLORDLG.GREEN, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
+                        SendDlgItemMessageW(hwnd, (DialogItemID)COLORDLG.BLUE, (WM)EM.SETMARGINS, (IntPtr)(EC.LEFTMARGIN | EC.RIGHTMARGIN));
+                        IntPtr hwndCtl = GetDlgItem(hwnd, (DialogItemID)COLORDLG.MIX);
                         EnableWindow(hwndCtl, BOOL.FALSE);
                         SetWindowPos(
                             hwndCtl,
@@ -1124,15 +1124,15 @@ namespace System.Drawing.Design
                     case WM.COMMAND:
                         switch (PARAM.LOWORD(wParam))
                         {
-                            case (int)COLOR.ADD:
+                            case (int)COLORDLG.ADD:
                                 BOOL err = BOOL.FALSE;
-                                byte red = (byte)User32.GetDlgItemInt(hwnd, (int)COLOR.RED, &err, BOOL.FALSE);
+                                byte red = (byte)User32.GetDlgItemInt(hwnd, (int)COLORDLG.RED, &err, BOOL.FALSE);
                                 Debug.Assert(err.IsFalse(), "Couldn't find dialog member COLOR_RED");
 
-                                byte green = (byte)User32.GetDlgItemInt(hwnd, (int)COLOR.GREEN, &err, BOOL.FALSE);
+                                byte green = (byte)User32.GetDlgItemInt(hwnd, (int)COLORDLG.GREEN, &err, BOOL.FALSE);
                                 Debug.Assert(err.IsFalse(), "Couldn't find dialog member COLOR_GREEN");
 
-                                byte blue = (byte)User32.GetDlgItemInt(hwnd, (int)COLOR.BLUE, &err, BOOL.FALSE);
+                                byte blue = (byte)User32.GetDlgItemInt(hwnd, (int)COLORDLG.BLUE, &err, BOOL.FALSE);
                                 Debug.Assert(err.IsFalse(), "Couldn't find dialog member COLOR_BLUE");
 
                                 Color = Color.FromArgb(red, green, blue);

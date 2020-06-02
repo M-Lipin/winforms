@@ -43,4 +43,9 @@ internal static partial class Interop
             NOACTIVATE = 0x08000000
         }
     }
+
+    public static bool IsBitSet(this User32.WS_EX flags, User32.WS_EX bit)
+    {
+        return (flags & bit) == bit;
+    }
 }

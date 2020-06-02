@@ -35,4 +35,9 @@ internal static partial class Interop
             MAXIMIZEBOX = 0x00010000
         }
     }
+
+    public static bool IsBitSet(this User32.WS flags, User32.WS bit)
+    {
+        return (flags & bit) == bit;
+    }
 }

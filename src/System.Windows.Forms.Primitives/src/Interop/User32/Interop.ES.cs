@@ -27,4 +27,9 @@ internal static partial class Interop
             NUMBER = 0x2000
         }
     }
+
+    public static bool IsBitSet(this User32.ES flags, User32.ES bit)
+    {
+        return (flags & bit) == bit;
+    }
 }

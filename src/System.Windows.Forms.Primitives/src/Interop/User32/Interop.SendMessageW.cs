@@ -51,6 +51,22 @@ internal static partial class Interop
         }
 
         public unsafe static IntPtr SendMessageW(
+            IntPtr hWnd,
+            WM Msg,
+            IntPtr wParam,
+            out string lParam)
+        {
+            Span<char> str = stackalloc char[(int)wParam];
+
+            fixed (char* c = str)
+            {
+                IntPtr result = SendMessageW(hWnd, Msg, wParam, (IntPtr)(void*)c);
+                lParam = str.ToString();
+                return result;
+            }
+        }
+
+        public unsafe static IntPtr SendMessageW(
             HandleRef hWnd,
             WM Msg,
             IntPtr wParam,
@@ -95,6 +111,20 @@ internal static partial class Interop
             fixed (void* l = &lParam)
             {
                 return SendMessageW(hWnd, Msg, wParam, (IntPtr)l);
+            }
+        }
+
+        public unsafe static IntPtr SendMessageW<TWParam, TLParam>(
+            IHandle hWnd,
+            WM Msg,
+            ref TWParam wParam,
+            ref TLParam lParam)
+            where TWParam : unmanaged
+            where TLParam : unmanaged
+        {
+            fixed (void* w = &wParam, l = &lParam)
+            {
+                return SendMessageW(hWnd, Msg, (IntPtr)w, (IntPtr)l);
             }
         }
     }
