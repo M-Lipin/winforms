@@ -25,7 +25,7 @@ namespace System.Windows.Forms
     [DefaultEvent(nameof(TextChanged))]
     [DefaultBindingProperty(nameof(Text))]
     [Designer("System.Windows.Forms.Design.TextBoxBaseDesigner, " + AssemblyRef.SystemDesign)]
-    public abstract class TextBoxBase : Control
+    public abstract partial class TextBoxBase : Control
     {
         // The boolean properties for this control are contained in the textBoxFlags bit
         // vector.  We can store up to 32 boolean values in this one vector.  Here we
@@ -684,6 +684,226 @@ namespace System.Windows.Forms
             }
         }
 
+        internal int GetFirstVisibleLine()
+        {
+            return unchecked((int)(long)SendMessageW(this, (WM)EM.GETFIRSTVISIBLELINE));
+        }
+
+        internal int GetLineIndex(int line)
+        {
+            return unchecked((int)(long)SendMessageW(this, (WM)EM.LINEINDEX, (IntPtr)line));
+        }
+
+        internal int GetTextLength()
+        {
+            return unchecked((int)(long)SendMessageW(this, WM.GETTEXTLENGTH));
+        }
+
+        internal void GetVisibleRangePoints(out int start, out int end)
+        {
+            Rectangle rectangle = ClientRectangle;
+
+            if (rectangle.IsEmpty || rectangle.Width <= 0)
+            {
+                start = 0;
+                end = 0;
+
+                return;
+            }
+
+            // Multi-line edit controls are handled differently than single-line edit controls.
+            if (Multiline)
+            {
+                // Get the line number of the first visible line and start the range at
+                // the beginning of that line.
+                int firstLine = GetFirstVisibleLine();
+                start = GetLineIndex(firstLine);
+
+                // The latest line of a text
+                int lastLine = GetLineFromCharIndex(GetTextLength() - 1);
+
+                // Get the last symbol of the last visible line
+                if (lastLine < LinesPerPage)
+                {
+                    end = GetTextLength();
+                }
+                else
+                {
+                    end = GetLineIndex(firstLine + LinesPerPage);
+                }
+
+                // GetLineIndex returns end = -1 for a last text line
+                if (end < start)
+                {
+                    end = GetTextLength();
+                }
+
+                return;
+            }
+
+            // Get a text range for one-line edit control
+            Point ptStart = new Point(rectangle.Left + 1, rectangle.Top + 1);
+            Point ptEnd = new Point(rectangle.Right - 1, rectangle.Bottom - 1);
+
+            start = GetCharIndexFromPosition(ptStart) - 1;
+            end = GetCharIndexFromPosition(ptEnd) + 1; // an index of a last visible symbol
+
+            if (end < 0)
+            {
+                end = 0;
+            }
+
+            if (start < 0)
+            {
+                start = 0;
+            }
+
+            // The problem is that using a variable-width font the number of characters visible
+            // depends on the text that is in the edit control. So we just make sure that a symbol is visible.
+
+            if (start > 0)
+            {
+                Point pt = GetPositionFromCharIndex(start);
+
+                while (pt.X < rectangle.Left && start <= Text.Length)
+                {
+                    start++;
+                    pt = GetPositionFromCharIndex(start);
+                }
+            }
+
+            if (end > 0)
+            {
+                Point pt = GetPositionFromCharIndex(end);
+
+                while (pt.X > rectangle.Right && end >= 0)
+                {
+                    end--;
+                    pt = GetPositionFromCharIndex(end);
+                }
+            }
+        }
+
+        private WS GetWindowStyle()
+        {
+            IntPtr result = GetWindowLong(this, GWL.STYLE);
+            return (WS)IntPtrToInt32(result);
+        }
+
+        private ES GetEditStyle()
+        {
+            IntPtr result = GetWindowLong(this, GWL.STYLE);
+            return (ES)IntPtrToInt32(result);
+        }
+
+        // We have this wrapper because casting IntPtr to int may
+        // generate OverflowException when one of high 32 bits is set.
+        private static int IntPtrToInt32(IntPtr intPtr)
+        {
+            return unchecked((int)(long)intPtr);
+        }
+
+        internal bool LineScroll(int charactersHorizontal, int linesVertical)
+        {
+            // Sends an EM_LINESCROLL message to scroll it horizontally and/or vertically.
+            return SendMessageW(this, (WM)EM.LINESCROLL, (IntPtr)charactersHorizontal, (IntPtr)linesVertical) != IntPtr.Zero;
+        }
+
+        internal int LinesPerPage
+        {
+            get
+            {
+                int linePerPage = 0;
+                User32.WS style = GetWindowStyle();
+
+                if (style.IsBitSet(User32.WS.VSCROLL))
+                {
+                    // We call GetScrollInfo and return the size of the "page".
+                    User32.SCROLLINFO scrollInfo = new User32.SCROLLINFO();
+                    scrollInfo.cbSize = (uint)Marshal.SizeOf(typeof(User32.SCROLLINFO));
+                    scrollInfo.fMask = User32.SIF.ALL;
+
+                    BOOL result = User32.GetScrollInfo(this, User32.SB.VERT, ref scrollInfo);
+                    linePerPage = result.IsTrue() ? (int)scrollInfo.nPage : 0;
+
+                    if (Multiline && linePerPage <= 0)
+                    {
+                        linePerPage = 1;
+                    }
+                }
+                else
+                {
+                    Rectangle rect = ClientRectangle;
+
+                    if (rect.IsEmpty)
+                    {
+                        return linePerPage;
+                    }
+
+                    string s = new string('E', 1);
+                    GetTextExtentPoint32(s, out Size size);
+
+                    if (size.Height != 0)
+                    {
+                        linePerPage = (rect.Bottom - rect.Top) / size.Height;
+                    }
+                }
+
+                return linePerPage;
+            }
+        }
+
+        internal IntPtr GetFont()
+        {
+            return SendMessageW(this, WM.GETFONT);
+        }
+
+        internal static IntPtr SelectObject(IntPtr hdc, IntPtr hObject)
+        {
+            return Gdi32.SelectObject(hdc, hObject);
+        }
+
+        internal RECT GetRectangle()
+        {
+            // Send an EM_GETRECT message to find out the bounding rectangle.
+            RECT rectangle = new RECT();
+            SendMessageW(this, (WM)EM.GETRECT, (IntPtr)0, ref rectangle);
+            return rectangle;
+        }
+
+        private bool GetTextExtentPoint32(string text, out Size size)
+        {
+            size = new Size();
+
+            // Add the width of the character at that position.
+            // Note: if any of these can throw an exception then we should use a finally clause
+            // to ensure the DC is released.
+            IntPtr hdc = User32.GetDC(Handle);
+            if (hdc == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            IntPtr oldFont = IntPtr.Zero;
+            try
+            {
+                IntPtr hfont = GetFont();
+                oldFont = SelectObject(hdc, hfont);
+
+                BOOL result = Gdi32.GetTextExtentPoint32W(hdc, text, text.Length, ref size);
+                return result == BOOL.TRUE;
+            }
+            finally
+            {
+                if (oldFont != IntPtr.Zero)
+                {
+                    SelectObject(hdc, oldFont);
+                }
+
+                User32.ReleaseDC(Handle, hdc);
+            }
+        }
+
         /// <summary>
         ///  Gets or sets the maximum number of
         ///  characters the user can type into the text box control.
@@ -918,6 +1138,19 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
+        ///  Returns info about a selected text range.
+        ///  If there is no selection, start and end parameters are the position of the caret.
+        /// </summary>
+        /// <param name="start">First caret position of a selected text</param>
+        /// <param name="end">Last caret position of a selected text</param>
+        internal void GetSelection(out int start, out int end)
+        {
+            start = 0;
+            end = 0;
+            User32.SendMessageW<int, int>(this, (WM)EM.GETSEL, ref start, ref end);
+        }
+
+        /// <summary>
         ///  Get the currently selected text start position and length.  Use this method internally
         ///  to avoid calling SelectionStart + SelectionLength each of which does essentially the
         ///  same (save one message round trip).
@@ -1002,6 +1235,15 @@ namespace System.Windows.Forms
 
                     VerifyImeRestrictedModeChanged();
                 }
+            }
+        }
+
+        internal bool Scrollable
+        {
+            get
+            {
+                ES extendedStyle = GetEditStyle();
+                return extendedStyle.IsBitSet(ES.AUTOHSCROLL) || extendedStyle.IsBitSet(ES.AUTOVSCROLL);
             }
         }
 
@@ -1125,6 +1367,7 @@ namespace System.Windows.Forms
                 {
                     throw new ArgumentOutOfRangeException(nameof(value), value, string.Format(SR.InvalidArgument, nameof(SelectionStart), value));
                 }
+
                 Select(value, SelectionLength);
             }
         }
@@ -1364,6 +1607,11 @@ namespace System.Windows.Forms
         ///  Copies the current selection in the text box to the Clipboard.
         /// </summary>
         public void Copy() => SendMessageW(this, WM.COPY);
+
+        protected override AccessibleObject CreateAccessibilityInstance()
+        {
+            return new TextBoxBaseAccessibleObject(this);
+        }
 
         protected override void CreateHandle()
         {
@@ -1605,7 +1853,18 @@ namespace System.Windows.Forms
             // this means a multiline = true textbox wont natrually grow in height when
             // the text changes.
             CommonProperties.xClearPreferredSizeCache(this);
+
+            if (IsHandleCreated)
+            {
+                RaiseUIATextChangedEvent();
+            }
+
             base.OnTextChanged(e);
+        }
+
+        private protected virtual void RaiseUIATextChangedEvent()
+        {
+            AccessibilityObject?.RaiseAutomationEvent(UiaCore.UIA.Text_TextChangedEventId);
         }
 
         /// <summary>
@@ -1669,6 +1928,58 @@ namespace System.Windows.Forms
 
             int i = (int)User32.SendMessageW(this, (WM)EM.POSFROMCHAR, (IntPtr)index);
             return new Point(PARAM.SignedLOWORD(i), PARAM.SignedHIWORD(i));
+        }
+
+        internal Point GetPositionFromCharUR(int index, string text)
+        {
+            // A variation on EM_POSFROMCHAR that returns the upper-right corner instead of upper-left.
+
+            if (index < 0 || index >= text.Length)
+            {
+                return Point.Empty;
+            }
+
+            // Get the upper-left of the character.
+            Point pt;
+            char ch = text[index];
+
+            switch (ch)
+            {
+                case '\n':
+                case '\r':
+                    // get the UL corner of the character and return it since these characters have no width.
+                    pt = GetPositionFromCharIndex(index);
+                    break;
+
+                case '\t':
+                    {
+                        // for tabs the calculated width of the character is no help so we use the
+                        // UL corner of the following character if it is on the same line.
+                        bool useNext = index < TextLength - 1 && GetLineFromCharIndex(index + 1) == GetLineFromCharIndex(index);
+                        pt = GetPositionFromCharIndex(useNext ? index + 1 : index);
+                    }
+
+                    break;
+
+                default:
+                    {
+                        // get the UL corner of the character
+                        pt = GetPositionFromCharIndex(index);
+
+                        // add the width of the character at that position.
+                        string s = new string(ch, 1);
+                        if (!GetTextExtentPoint32(s, out Size size))
+                        {
+                            break;
+                        }
+
+                        pt.X += size.Width;
+                    }
+
+                    break;
+            }
+
+            return pt;
         }
 
         /// <summary>
@@ -1813,6 +2124,7 @@ namespace System.Windows.Forms
                 {
                     length = (int)longLength;
                 }
+
                 start = textLen;
             }
 
@@ -1835,6 +2147,8 @@ namespace System.Windows.Forms
                 AdjustSelectionStartAndEnd(start, length, out int s, out int e, textLen);
 
                 SendMessageW(this, (WM)EM.SETSEL, (IntPtr)s, (IntPtr)e);
+
+                AccessibilityObject.RaiseAutomationEvent(UiaCore.UIA.Text_TextSelectionChangedEventId);
             }
             else
             {
@@ -2205,6 +2519,17 @@ namespace System.Windows.Forms
                     base.WndProc(ref m);
                     break;
             }
+        }
+
+        internal unsafe LOGFONTW GetLogfont()
+        {
+            IntPtr font = GetFont();
+            Debug.Assert(font != IntPtr.Zero, "WindowsEditBox.GetLogfont got null HFONT.");
+
+            bool result = Gdi32.GetObjectW(font, out User32.LOGFONTW logFont);
+            Debug.Assert(result, "WindowsEditBox.GetObject unexpected return value.");
+
+            return logFont;
         }
     }
 }
