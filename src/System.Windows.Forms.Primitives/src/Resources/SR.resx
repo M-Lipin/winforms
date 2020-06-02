@@ -132,4 +132,19 @@
   <data name="PropertyValueInvalidEntry" xml:space="preserve">
     <value>One or more entries are not valid in the IDictionary parameter. Verify that all values match up to the object's properties.</value>
   </data>
+  <data name="NoOffetTextRangeInvalidOperationExceptionMessage" xml:space="preserve">
+    <value>There are no offsets among the arguments.</value>
+  </data>
+  <data name="TextRangeStartInvalidExceptionMessage" xml:space="preserve">
+    <value>Invalid text range start character offset.</value>
+  </data>
+  <data name="TextRangeEndInvalidExceptionMessage" xml:space="preserve">
+    <value>Invalid text range end character offset.</value>
+  </data>
+  <data name="UiaTextProviderTextLengthInvalidExceptionMessageTemplate" xml:space="preserve">
+    <value>Text length should be equal or more than 0 and less than {0}.</value>
+  </data>
+  <data name="UiaTextRangeConstructorNullParameterExceptionMessage" xml:space="preserve">
+    <value>Invalid text range argument. Constructor parameters should not be null.</value>
+  </data>
 </root>

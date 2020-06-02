@@ -17,6 +17,11 @@
         <target state="translated">integer 형식을 float 형식으로 변환할 수 없습니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoOffetTextRangeInvalidOperationExceptionMessage">
+        <source>There are no offsets among the arguments.</source>
+        <target state="new">There are no offsets among the arguments.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="PropertyValueInvalidEntry">
         <source>One or more entries are not valid in the IDictionary parameter. Verify that all values match up to the object's properties.</source>
         <target state="translated">IDictionary 매개 변수에 잘못된 항목이 하나 이상 있습니다. 모든 값이 개체의 속성과 일치하는지 확인하십시오.</target>
@@ -25,6 +30,26 @@
       <trans-unit id="TextParseFailedFormat">
         <source>Parse of Text("{0}") expected text in the format "{1}" did not succeed.</source>
         <target state="translated">텍스트("{0}")를 구문 분석하지 못했습니다. "{1}" 서식의 텍스트가 필요합니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="TextRangeEndInvalidExceptionMessage">
+        <source>Invalid text range end character offset.</source>
+        <target state="new">Invalid text range end character offset.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="TextRangeStartInvalidExceptionMessage">
+        <source>Invalid text range start character offset.</source>
+        <target state="new">Invalid text range start character offset.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UiaTextProviderTextLengthInvalidExceptionMessageTemplate">
+        <source>Text length should be equal or more than 0 and less than {0}.</source>
+        <target state="new">Text length should be equal or more than 0 and less than {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UiaTextRangeConstructorNullParameterExceptionMessage">
+        <source>Invalid text range argument. Constructor parameters should not be null.</source>
+        <target state="new">Invalid text range argument. Constructor parameters should not be null.</target>
         <note />
       </trans-unit>
     </body>

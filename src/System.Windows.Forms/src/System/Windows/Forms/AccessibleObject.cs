@@ -42,7 +42,9 @@ namespace System.Windows.Forms
         UiaCore.ISelectionProvider,
         UiaCore.ISelectionItemProvider,
         UiaCore.IRawElementProviderHwndOverride,
-        UiaCore.IScrollItemProvider
+        UiaCore.IScrollItemProvider,
+        UiaCore.ITextProvider,
+        UiaCore.ITextProvider2
     {
         /// <summary>
         ///  Specifies the <see cref='IAccessible'/> interface used by this <see cref='AccessibleObject'/>.
@@ -61,6 +63,9 @@ namespace System.Windows.Forms
 
         // Indicates this object is being used ONLY to wrap a system IAccessible
         private readonly bool systemWrapper = false;
+
+        private UiaTextProvider? _textProvider = null;
+        private UiaTextProvider2? _textProvider2 = null;
 
         // The support for the UIA Notification event begins in RS3.
         // Assume the UIA Notification event is available until we learn otherwise.
@@ -540,15 +545,13 @@ namespace System.Windows.Forms
 
         internal virtual UiaCore.IRawElementProviderSimple? HostRawElementProvider => null;
 
-        internal virtual object? GetPropertyValue(UiaCore.UIA propertyID)
-        {
-            if (propertyID == UiaCore.UIA.IsInvokePatternAvailablePropertyId)
+        internal virtual object? GetPropertyValue(UiaCore.UIA propertyID) =>
+            propertyID switch
             {
-                return IsInvokePatternAvailable;
-            }
-
-            return null;
-        }
+                UiaCore.UIA.IsInvokePatternAvailablePropertyId => IsInvokePatternAvailable,
+                UiaCore.UIA.BoundingRectanglePropertyId => Bounds,
+                _ => null
+            };
 
         private bool IsInvokePatternAvailable
         {
@@ -663,6 +666,29 @@ namespace System.Windows.Forms
         internal virtual UiaCore.IRawElementProviderSimple? ContainingGrid => null;
 
         internal virtual void Invoke() => DoDefaultAction();
+
+        internal virtual UiaCore.ITextRangeProvider? DocumentRangeInternal => _textProvider?.DocumentRange;
+
+        internal virtual UiaCore.ITextRangeProvider[]? GetTextSelection() => _textProvider?.GetSelection();
+
+        internal virtual UiaCore.ITextRangeProvider[]? GetTextVisibleRanges() => _textProvider?.GetVisibleRanges();
+
+        internal virtual UiaCore.ITextRangeProvider? GetTextRangeFromChild(UiaCore.IRawElementProviderSimple childElement) =>
+            _textProvider?.RangeFromChild(childElement);
+
+        internal virtual UiaCore.ITextRangeProvider? GetTextRangeFromPoint(Point screenLocation) => _textProvider?.RangeFromPoint(screenLocation);
+
+        internal virtual UiaCore.SupportedTextSelection SupportedTextSelectionInternal =>
+            _textProvider != null ? _textProvider.SupportedTextSelection : UiaCore.SupportedTextSelection.None;
+
+        internal virtual UiaCore.ITextRangeProvider? GetTextCaretRange(out BOOL isActive)
+        {
+            isActive = BOOL.FALSE;
+            return _textProvider2?.GetCaretRange(out isActive);
+        }
+
+        internal virtual UiaCore.ITextRangeProvider? GetRangeFromAnnotation(UiaCore.IRawElementProviderSimple annotationElement) =>
+            _textProvider2?.RangeFromAnnotation(annotationElement);
 
         internal virtual bool IsReadOnly => false;
 
@@ -852,6 +878,37 @@ namespace System.Windows.Forms
         UiaCore.ExpandCollapseState UiaCore.IExpandCollapseProvider.ExpandCollapseState => ExpandCollapseState;
 
         void UiaCore.IInvokeProvider.Invoke() => Invoke();
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider.DocumentRange => DocumentRangeInternal;
+
+        UiaCore.ITextRangeProvider[]? UiaCore.ITextProvider.GetSelection() => GetTextSelection();
+
+        UiaCore.ITextRangeProvider[]? UiaCore.ITextProvider.GetVisibleRanges() => GetTextVisibleRanges();
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider.RangeFromChild(UiaCore.IRawElementProviderSimple childElement) =>
+            GetTextRangeFromChild(childElement);
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider.RangeFromPoint(Point screenLocation) => GetTextRangeFromPoint(screenLocation);
+
+        UiaCore.SupportedTextSelection UiaCore.ITextProvider.SupportedTextSelection => SupportedTextSelectionInternal;
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider2.DocumentRange => DocumentRangeInternal;
+
+        UiaCore.ITextRangeProvider[]? UiaCore.ITextProvider2.GetSelection() => GetTextSelection();
+
+        UiaCore.ITextRangeProvider[]? UiaCore.ITextProvider2.GetVisibleRanges() => GetTextVisibleRanges();
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider2.RangeFromChild(UiaCore.IRawElementProviderSimple childElement) =>
+            GetTextRangeFromChild(childElement);
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider2.RangeFromPoint(Point screenLocation) => GetTextRangeFromPoint(screenLocation);
+
+        UiaCore.SupportedTextSelection UiaCore.ITextProvider2.SupportedTextSelection => SupportedTextSelectionInternal;
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider2.GetCaretRange(out BOOL isActive) => GetTextCaretRange(out isActive);
+
+        UiaCore.ITextRangeProvider? UiaCore.ITextProvider2.RangeFromAnnotation(UiaCore.IRawElementProviderSimple annotationElement) =>
+            GetRangeFromAnnotation(annotationElement);
 
         BOOL UiaCore.IValueProvider.IsReadOnly => IsReadOnly ? BOOL.TRUE : BOOL.FALSE;
 
@@ -1972,6 +2029,12 @@ namespace System.Windows.Forms
                 systemIEnumVariant = en as Oleaut32.IEnumVariant;
                 systemIOleWindow = acc as Ole32.IOleWindow;
             }
+        }
+
+        internal void UseTextProviders(UiaTextProvider textProvider, UiaTextProvider2 textProvider2)
+        {
+            _textProvider = textProvider;
+            _textProvider2 = textProvider2;
         }
 
         /// <summary>

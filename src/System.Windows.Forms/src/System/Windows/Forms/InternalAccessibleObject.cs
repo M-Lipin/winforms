@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -39,7 +40,9 @@ namespace System.Windows.Forms
         ISelectionProvider,
         ISelectionItemProvider,
         IScrollItemProvider,
-        IRawElementProviderHwndOverride
+        IRawElementProviderHwndOverride,
+        ITextProvider,
+        ITextProvider2
     {
         private IAccessible publicIAccessible;                      // AccessibleObject as IAccessible
         private readonly Oleaut32.IEnumVariant publicIEnumVariant;  // AccessibleObject as Oleaut32.IEnumVariant
@@ -67,6 +70,8 @@ namespace System.Windows.Forms
         private readonly ISelectionItemProvider publicISelectionItemProvider;                      // AccessibleObject as ISelectionItemProvider
         private readonly IScrollItemProvider publicIScrollItemProvider;                            // AccessibleObject as IScrollItemProvider
         private readonly IRawElementProviderHwndOverride publicIRawElementProviderHwndOverride;    // AccessibleObject as IRawElementProviderHwndOverride
+        private readonly ITextProvider publicITextProvider;                                        // AccessibleObject as ITextProvider
+        private readonly ITextProvider2 publicITextProvider2;                                      // AccessibleObject as ITextProvider2
 
         /// <summary>
         ///  Create a new wrapper.
@@ -97,6 +102,8 @@ namespace System.Windows.Forms
             publicISelectionItemProvider = (ISelectionItemProvider)accessibleImplemention;
             publicIScrollItemProvider = (IScrollItemProvider)accessibleImplemention;
             publicIRawElementProviderHwndOverride = (IRawElementProviderHwndOverride)accessibleImplemention;
+            publicITextProvider = (ITextProvider)accessibleImplemention;
+            publicITextProvider2 = (ITextProvider2)accessibleImplemention;
             // Note: Deliberately not holding onto AccessibleObject to enforce all access through the interfaces
         }
 
@@ -289,70 +296,74 @@ namespace System.Windows.Forms
         object? IRawElementProviderSimple.GetPatternProvider(UIA patternId)
         {
             object? obj = publicIRawElementProviderSimple.GetPatternProvider(patternId);
-            if (obj != null)
-            {
-                // we always want to return the internal accessible object
-                if (patternId == UIA.ExpandCollapsePatternId)
-                {
-                    return (IExpandCollapseProvider)this;
-                }
-                else if (patternId == UIA.ValuePatternId)
-                {
-                    return (IValueProvider)this;
-                }
-                else if (patternId == UIA.RangeValuePatternId)
-                {
-                    return (IRangeValueProvider)this;
-                }
-                else if (patternId == UIA.TogglePatternId)
-                {
-                    return (IToggleProvider)this;
-                }
-                else if (patternId == UIA.TablePatternId)
-                {
-                    return (ITableProvider)this;
-                }
-                else if (patternId == UIA.TableItemPatternId)
-                {
-                    return (ITableItemProvider)this;
-                }
-                else if (patternId == UIA.GridPatternId)
-                {
-                    return (IGridProvider)this;
-                }
-                else if (patternId == UIA.GridItemPatternId)
-                {
-                    return (IGridItemProvider)this;
-                }
-                else if (patternId == UIA.InvokePatternId)
-                {
-                    return (IInvokeProvider)this;
-                }
-                else if (patternId == UIA.LegacyIAccessiblePatternId)
-                {
-                    return (ILegacyIAccessibleProvider)this;
-                }
-                else if (patternId == UIA.SelectionPatternId)
-                {
-                    return (ISelectionProvider)this;
-                }
-                else if (patternId == UIA.SelectionItemPatternId)
-                {
-                    return (ISelectionItemProvider)this;
-                }
-                else if (patternId == UIA.ScrollItemPatternId)
-                {
-                    return (IScrollItemProvider)this;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
+            if (obj == null)
             {
                 return null;
             }
+
+            // we always want to return the internal accessible object
+            if (patternId == UIA.ExpandCollapsePatternId)
+            {
+                return (IExpandCollapseProvider)this;
+            }
+            else if (patternId == UIA.ValuePatternId)
+            {
+                return (IValueProvider)this;
+            }
+            else if (patternId == UIA.RangeValuePatternId)
+            {
+                return (IRangeValueProvider)this;
+            }
+            else if (patternId == UIA.TogglePatternId)
+            {
+                return (IToggleProvider)this;
+            }
+            else if (patternId == UIA.TablePatternId)
+            {
+                return (ITableProvider)this;
+            }
+            else if (patternId == UIA.TableItemPatternId)
+            {
+                return (ITableItemProvider)this;
+            }
+            else if (patternId == UIA.GridPatternId)
+            {
+                return (IGridProvider)this;
+            }
+            else if (patternId == UIA.GridItemPatternId)
+            {
+                return (IGridItemProvider)this;
+            }
+            else if (patternId == UIA.InvokePatternId)
+            {
+                return (IInvokeProvider)this;
+            }
+            else if (patternId == UIA.LegacyIAccessiblePatternId)
+            {
+                return (ILegacyIAccessibleProvider)this;
+            }
+            else if (patternId == UIA.SelectionPatternId)
+            {
+                return (ISelectionProvider)this;
+            }
+            else if (patternId == UIA.SelectionItemPatternId)
+            {
+                return (ISelectionItemProvider)this;
+            }
+            else if (patternId == UIA.ScrollItemPatternId)
+            {
+                return (IScrollItemProvider)this;
+            }
+            else if (patternId == UIA.TextPatternId)
+            {
+                return (ITextProvider)this;
+            }
+            else if (patternId == UIA.TextPattern2Id)
+            {
+                return (ITextProvider2)this;
+            }
+
+            return null;
         }
 
         object? IRawElementProviderSimple.GetPropertyValue(UIA propertyID)
@@ -416,6 +427,40 @@ namespace System.Windows.Forms
             => publicILegacyIAccessibleProvider.SetValue(szValue);
 
         void IInvokeProvider.Invoke() => publicIInvokeProvider.Invoke();
+
+        ITextRangeProvider[] ITextProvider.GetSelection() => publicITextProvider.GetSelection();
+
+        ITextRangeProvider[] ITextProvider.GetVisibleRanges() => publicITextProvider.GetVisibleRanges();
+
+        ITextRangeProvider ITextProvider.RangeFromChild(IRawElementProviderSimple childElement) =>
+            publicITextProvider.RangeFromChild(childElement);
+
+        ITextRangeProvider ITextProvider.RangeFromPoint(Point screenLocation) =>
+            publicITextProvider.RangeFromPoint(screenLocation);
+
+        SupportedTextSelection ITextProvider.SupportedTextSelection => publicITextProvider.SupportedTextSelection;
+
+        ITextRangeProvider ITextProvider.DocumentRange => publicITextProvider.DocumentRange;
+
+        ITextRangeProvider[] ITextProvider2.GetSelection() => publicITextProvider2.GetSelection();
+
+        ITextRangeProvider[] ITextProvider2.GetVisibleRanges() => publicITextProvider2.GetVisibleRanges();
+
+        ITextRangeProvider ITextProvider2.RangeFromChild(IRawElementProviderSimple childElement) =>
+            publicITextProvider2.RangeFromChild(childElement);
+
+        ITextRangeProvider ITextProvider2.RangeFromPoint(Point screenLocation) =>
+            publicITextProvider2.RangeFromPoint(screenLocation);
+
+        SupportedTextSelection ITextProvider2.SupportedTextSelection => publicITextProvider2.SupportedTextSelection;
+
+        ITextRangeProvider ITextProvider2.DocumentRange => publicITextProvider2.DocumentRange;
+
+        ITextRangeProvider ITextProvider2.GetCaretRange(out BOOL isActive) =>
+            publicITextProvider2.GetCaretRange(out isActive);
+
+        ITextRangeProvider ITextProvider2.RangeFromAnnotation(IRawElementProviderSimple annotationElement) =>
+            publicITextProvider2.RangeFromAnnotation(annotationElement);
 
         BOOL IValueProvider.IsReadOnly => publicIValueProvider.IsReadOnly;
 

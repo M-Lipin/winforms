@@ -17,6 +17,11 @@
         <target state="translated">Tam sayı kayan noktalıya dönüştürülemez.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoOffetTextRangeInvalidOperationExceptionMessage">
+        <source>There are no offsets among the arguments.</source>
+        <target state="new">There are no offsets among the arguments.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="PropertyValueInvalidEntry">
         <source>One or more entries are not valid in the IDictionary parameter. Verify that all values match up to the object's properties.</source>
         <target state="translated">IDictionary parametresindeki bir veya daha fazla girdi geçerli değil. Tüm değerlerin nesnenin özellikleriyle eşleştiğini doğrulayın.</target>
@@ -25,6 +30,26 @@
       <trans-unit id="TextParseFailedFormat">
         <source>Parse of Text("{0}") expected text in the format "{1}" did not succeed.</source>
         <target state="translated">"{1}" biçiminde olması beklenen Metin Ayrıştırma ("{0}") başarısız oldu.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="TextRangeEndInvalidExceptionMessage">
+        <source>Invalid text range end character offset.</source>
+        <target state="new">Invalid text range end character offset.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="TextRangeStartInvalidExceptionMessage">
+        <source>Invalid text range start character offset.</source>
+        <target state="new">Invalid text range start character offset.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UiaTextProviderTextLengthInvalidExceptionMessageTemplate">
+        <source>Text length should be equal or more than 0 and less than {0}.</source>
+        <target state="new">Text length should be equal or more than 0 and less than {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UiaTextRangeConstructorNullParameterExceptionMessage">
+        <source>Invalid text range argument. Constructor parameters should not be null.</source>
+        <target state="new">Invalid text range argument. Constructor parameters should not be null.</target>
         <note />
       </trans-unit>
     </body>
