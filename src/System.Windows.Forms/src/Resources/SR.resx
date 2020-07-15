@@ -6671,6 +6671,9 @@ Stack trace where the illegal operation occurred was:
   <data name="TaskDialogControlNotCreated" xml:space="preserve">
     <value>The control has not been created.</value>
   </data>
+  <data name="RaiseAutomationEditNotification" xml:space="preserve">
+    <value>{0}, edit,</value>
+  </data>
   <data name="TaskDialogInstanceAlreadyShown" xml:space="preserve">
     <value>This {0} instance is already being shown.</value>
   </data>

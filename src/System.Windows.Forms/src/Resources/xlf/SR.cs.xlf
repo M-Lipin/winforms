@@ -8366,6 +8366,11 @@ Trasování zásobníku, kde došlo k neplatné operaci:
         <target state="translated">Vyvolá se při změně hodnoty vlastnosti TextAlign.</target>
         <note />
       </trans-unit>
+      <trans-unit id="RaiseAutomationEditNotification">
+        <source>{0}, edit,</source>
+        <target state="new">{0}, edit,</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ReadonlyControlsCollection">
         <source>Collection is read only.</source>
         <target state="translated">Kolekce je jen pro čtení.</target>

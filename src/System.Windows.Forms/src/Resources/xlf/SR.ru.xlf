@@ -8367,6 +8367,11 @@ Stack trace where the illegal operation occurred was:
         <target state="translated">Происходит при изменении значения свойства TextBoxTextAlign.</target>
         <note />
       </trans-unit>
+      <trans-unit id="RaiseAutomationEditNotification">
+        <source>{0}, edit,</source>
+        <target state="new">{0}, edit,</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ReadonlyControlsCollection">
         <source>Collection is read only.</source>
         <target state="translated">Коллекция предназначена только для чтения.</target>

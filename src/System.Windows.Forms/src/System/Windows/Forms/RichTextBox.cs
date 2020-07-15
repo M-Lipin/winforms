@@ -2698,9 +2698,6 @@ namespace System.Windows.Forms
             return base.ProcessCmdKey(ref m, keyData);
         }
 
-        private protected override void RaiseUIATextChangedEvent()
-        { }
-
         /// <summary>
         ///  Redoes the last undone editing operation.
         /// </summary>

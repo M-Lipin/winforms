@@ -8366,6 +8366,11 @@ Traccia dello stack da cui si è verificata l'operazione non valida:
         <target state="translated">Generato quando il valore della proprietà TextAlign cambia</target>
         <note />
       </trans-unit>
+      <trans-unit id="RaiseAutomationEditNotification">
+        <source>{0}, edit,</source>
+        <target state="new">{0}, edit,</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ReadonlyControlsCollection">
         <source>Collection is read only.</source>
         <target state="translated">Raccolta in sola lettura.</target>

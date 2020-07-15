@@ -1853,18 +1853,7 @@ namespace System.Windows.Forms
             // this means a multiline = true textbox wont natrually grow in height when
             // the text changes.
             CommonProperties.xClearPreferredSizeCache(this);
-
-            if (IsHandleCreated)
-            {
-                RaiseUIATextChangedEvent();
-            }
-
             base.OnTextChanged(e);
-        }
-
-        private protected virtual void RaiseUIATextChangedEvent()
-        {
-            AccessibilityObject?.RaiseAutomationEvent(UiaCore.UIA.Text_TextChangedEventId);
         }
 
         /// <summary>

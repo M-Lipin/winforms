@@ -8366,6 +8366,11 @@ El seguimiento de la pila donde tuvo lugar la operación no válida fue:
         <target state="translated">Tiene lugar cuando el valor de la propiedad TextAlign cambia</target>
         <note />
       </trans-unit>
+      <trans-unit id="RaiseAutomationEditNotification">
+        <source>{0}, edit,</source>
+        <target state="new">{0}, edit,</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ReadonlyControlsCollection">
         <source>Collection is read only.</source>
         <target state="translated">La colección es de solo lectura.</target>

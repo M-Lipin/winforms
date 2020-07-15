@@ -5,6 +5,7 @@
 #nullable disable
 
 using System.Drawing;
+using System.Windows.Forms.Automation;
 using static Interop;
 
 namespace System.Windows.Forms
@@ -30,11 +31,17 @@ namespace System.Windows.Forms
                 set
                 {
                     bool valueChanged = (value != base.Text);
-                    base.Text = value;
+
                     if (valueChanged)
                     {
-                        AccessibilityNotifyClients(AccessibleEvents.NameChange, -1);
+                        var accessibilityObject = AccessibilityObject;
+                        accessibilityObject?.RaiseAutomationNotification(
+                            AutomationNotificationKind.Other,
+                            AutomationNotificationProcessing.ImportantMostRecent,
+                            string.Format(SR.RaiseAutomationEditNotification, accessibilityObject?.Name ?? string.Empty));
                     }
+
+                    base.Text = value;
                 }
             }
 
